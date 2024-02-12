@@ -24,7 +24,7 @@ const Categories = [
   'rust',
   'swift',
   'terraform',
-  'unity3d'
+  'unity3d',
 ] as const;
 
 export type Category = (typeof Categories)[number];

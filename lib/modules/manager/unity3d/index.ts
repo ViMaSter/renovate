@@ -3,16 +3,11 @@ import { Unity3dDatasource } from '../../datasource/unity3d';
 export { extractPackageFile } from './extract';
 
 export const defaultConfig = {
-  fileMatch: [
-    'ProjectSettings/ProjectVersion.txt',
-  ],
+  fileMatch: ['ProjectSettings/ProjectVersion.txt'],
   packageRules: [
     {
       groupName: 'Unity Editor',
-      matchPackageNames: [
-        'm_EditorVersion',
-        'm_EditorVersionWithRevision',
-      ],
+      matchPackageNames: ['m_EditorVersion', 'm_EditorVersionWithRevision'],
     },
   ],
 };

@@ -1,9 +1,12 @@
-import { regEx } from "../../../util/regex";
-import type { PackageDependency, PackageFileContent } from "../types";
+import { regEx } from '../../../util/regex';
+import type { PackageDependency, PackageFileContent } from '../types';
 
-const supportedExtensionsKey = ['m_EditorVersionWithRevision', 'm_EditorVersion'];
+const supportedExtensionsKey = [
+  'm_EditorVersionWithRevision',
+  'm_EditorVersion',
+];
 
-const parseLine = (line: string) : PackageDependency | null => {
+const parseLine = (line: string): PackageDependency | null => {
   const matches = regEx(/^(?<depName>.+): (?<currentValue>.+)/g).exec(line);
   if (!matches) {
     return null;
@@ -19,7 +22,8 @@ const parseLine = (line: string) : PackageDependency | null => {
   }
 
   return {
-    autoReplaceStringTemplate: '{{depName}}{{#if newValue}}:{{newValue}}{{/if}}',
+    autoReplaceStringTemplate:
+      '{{depName}}{{#if newValue}}:{{newValue}}{{/if}}',
     currentDigest: undefined,
     currentValue: version,
     datasource: 'unity3d',
@@ -27,7 +31,7 @@ const parseLine = (line: string) : PackageDependency | null => {
     depType: 'final',
     replaceString: matches[0],
   };
-}
+};
 
 export function extractPackageFile(
   content: string,
@@ -40,9 +44,9 @@ export function extractPackageFile(
   return {
     deps: content
       .split('\n')
-      .map(line => line.trim())
-      .filter(line => line.length > 0)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
       .map(parseLine)
-      .filter(dep => dep !== null) as PackageDependency[],
+      .filter((dep) => dep !== null) as PackageDependency[],
   };
 }
