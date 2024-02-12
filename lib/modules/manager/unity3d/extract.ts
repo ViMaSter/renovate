@@ -1,11 +1,12 @@
 import { regEx } from '../../../util/regex';
 import type { PackageDependency, PackageFileContent } from '../types';
 
+export const fileMatchRegex : RegExp[] = [/(^|\/)ProjectSettings\/ProjectVersion\.txt/];
+
 const supportedExtensionsKey = [
   'm_EditorVersionWithRevision',
   'm_EditorVersion',
 ];
-
 const parseLine = (line: string): PackageDependency | null => {
   const matches = regEx(/^(?<depName>.+): (?<currentValue>.+)/g).exec(line);
   if (!matches) {
@@ -37,7 +38,7 @@ export function extractPackageFile(
   content: string,
   fileName?: string,
 ): PackageFileContent {
-  if (!fileName?.endsWith('ProjectSettings/ProjectVersion.txt')) {
+  if (!fileMatchRegex.every((regex : RegExp) => regex.test(fileName ?? ''))) {
     return { deps: [] };
   }
 

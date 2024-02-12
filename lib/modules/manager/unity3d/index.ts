@@ -1,9 +1,10 @@
 import type { Category } from '../../../constants';
 import { Unity3dDatasource } from '../../datasource/unity3d';
+import { fileMatchRegex } from './extract';
 export { extractPackageFile } from './extract';
 
 export const defaultConfig = {
-  fileMatch: ['ProjectSettings/ProjectVersion.txt'],
+  fileMatch: fileMatchRegex,
   packageRules: [
     {
       groupName: 'Unity Editor',

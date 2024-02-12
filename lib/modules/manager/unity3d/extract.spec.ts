@@ -23,6 +23,14 @@ describe('modules/manager/unity3d/extract', () => {
       expect(res).toBeEmpty();
     });
 
+    it('skips ProjectVersion.txt inside directories ending in `ProjectSettings`', () => {
+      const res = extractPackageFile(
+        'm_EditorVersion: 2022.3.19f1\n',
+        'OtherProjectSettings/ProjectVersion.txt',
+      )?.deps;
+      expect(res).toBeEmpty();
+    });
+
     it('handles m_EditorVersion', () => {
       const res = extractPackageFile(
         'm_EditorVersion: 2022.3.19f1\n',
