@@ -40,7 +40,9 @@ export function extractPackageFile(
   content: string,
   fileName?: string,
 ): PackageFileContent {
-  if (!fileMatchRegex.every((regex: string) => regEx(regex).test(fileName ?? ''))) {
+  if (
+    !fileMatchRegex.every((regex: string) => regEx(regex).test(fileName ?? ''))
+  ) {
     return { deps: [] };
   }
 
