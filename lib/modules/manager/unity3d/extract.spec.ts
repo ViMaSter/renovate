@@ -8,12 +8,17 @@ const stable = Fixtures.get('stable.ProjectVersion.txt');
 describe('modules/manager/unity3d/extract', () => {
   describe('extractPackageFile()', () => {
     it('handles no version', () => {
-      const res = extractPackageFile('m_EditorVersion: ', 'ProjectVersion.txt')?.deps;
+      const res = extractPackageFile('m_EditorVersion: ', 'ProjectSettings/ProjectVersion.txt')?.deps;
+      expect(res).toBeEmpty();
+    });
+
+    it('skips ProjectVersion.txt outside of ProjectSettings directory', () => {
+      const res = extractPackageFile('m_EditorVersion: 2022.3.19f1\n', 'ProjectVersion.txt')?.deps;
       expect(res).toBeEmpty();
     });
 
     it('handles m_EditorVersion', () => {
-      const res = extractPackageFile('m_EditorVersion: 2022.3.19f1\n', 'ProjectVersion.txt')?.deps;
+      const res = extractPackageFile('m_EditorVersion: 2022.3.19f1\n', 'ProjectSettings/ProjectVersion.txt')?.deps;
       expect(res).toEqual([
         {
           autoReplaceStringTemplate:
@@ -29,7 +34,7 @@ describe('modules/manager/unity3d/extract', () => {
     });
 
     it('handles beta versions', () => {
-      const res = extractPackageFile(beta, 'ProjectVersion.txt')?.deps;
+      const res = extractPackageFile(beta, 'ProjectSettings/ProjectVersion.txt')?.deps;
       expect(res).toEqual([
         {
           autoReplaceStringTemplate:
@@ -55,7 +60,7 @@ describe('modules/manager/unity3d/extract', () => {
     });
 
     it('handles stable versions', () => {
-      const res = extractPackageFile(stable, 'ProjectVersion.txt')?.deps;
+      const res = extractPackageFile(stable, 'ProjectSettings/ProjectVersion.txt')?.deps;
       expect(res).toEqual([
         {
           autoReplaceStringTemplate:
@@ -81,7 +86,7 @@ describe('modules/manager/unity3d/extract', () => {
     });
 
     it('handles lts versions', () => {
-      const res = extractPackageFile(lts, 'ProjectVersion.txt')?.deps;
+      const res = extractPackageFile(lts, 'ProjectSettings/ProjectVersion.txt')?.deps;
       expect(res).toEqual([
         {
           autoReplaceStringTemplate:
@@ -107,12 +112,12 @@ describe('modules/manager/unity3d/extract', () => {
     });
 
     it('skips if casing is incorrect', () => {
-      const res = extractPackageFile('m_EditorVersionWITHRevision: 2022.3.19f1 (244b723c30a6)\n', 'ProjectVersion.txt')?.deps;
+      const res = extractPackageFile('m_EditorVersionWITHRevision: 2022.3.19f1 (244b723c30a6)\n', 'ProjectSettings/ProjectVersion.txt')?.deps;
       expect(res).toBeEmpty();
     });
 
     it('skips abnormal spacing', () => {
-      const res = extractPackageFile('m_EditorVersionWithRevision:  2022.3.19f1 (244b723c30a6)\n','ProjectVersion.txt')?.deps;
+      const res = extractPackageFile('m_EditorVersionWithRevision:  2022.3.19f1 (244b723c30a6)\n','ProjectSettings/ProjectVersion.txt')?.deps;
       expect(res).toBeEmpty();
     });
   });

@@ -9,12 +9,8 @@ const parseLine = (line: string) : PackageDependency | null => {
     return null;
   }
   const key = matches.groups?.depName;
-  if (!key || !supportedExtensionsKey.includes(key)) {
-    return null;
-  }
-
   const version = matches.groups?.currentValue;
-  if (!version) {
+  if (!key || !version || !supportedExtensionsKey.includes(key)) {
     return null;
   }
 

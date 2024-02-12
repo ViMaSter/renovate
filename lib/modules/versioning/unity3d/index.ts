@@ -3,8 +3,8 @@ import { regEx } from '../../../util/regex';
 import { GenericVersion, GenericVersioningApi } from '../generic';
 import type { VersioningApi } from '../types';
 
-export const id = 'Unity3d';
-export const displayName = 'Unity3d';
+export const id = 'unity3d';
+export const displayName = 'Unity3D';
 export const urls = [
   'https://docs.unity3d.com/Manual/ScriptCompilationAssemblyDefinitionFiles.html#version-define-expressions:~:text=characters%20are%20supported.-,Unity%20version%20numbers,-Current%20versions%20of',
 ];
