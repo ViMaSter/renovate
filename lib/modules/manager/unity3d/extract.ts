@@ -1,8 +1,8 @@
 import { regEx } from '../../../util/regex';
 import type { PackageDependency, PackageFileContent } from '../types';
 
-export const fileMatchRegex: RegExp[] = [
-  /(^|\/)ProjectSettings\/ProjectVersion\.txt/,
+export const fileMatchRegex: string[] = [
+  '(^|/)ProjectSettings/ProjectVersion.txt',
 ];
 
 const supportedExtensionsKey = [
@@ -40,7 +40,7 @@ export function extractPackageFile(
   content: string,
   fileName?: string,
 ): PackageFileContent {
-  if (!fileMatchRegex.every((regex: RegExp) => regex.test(fileName ?? ''))) {
+  if (!fileMatchRegex.every((regex: string) => regEx(regex).test(fileName ?? ''))) {
     return { deps: [] };
   }
 
