@@ -20,21 +20,17 @@ class Unity3dVersioningApi extends GenericVersioningApi {
     ['Stable (China)', 'c'],
   ]);
   private static readonly ReleaseStreamTypeKeyOrder = Array.from(
-    Unity3dVersioningApi.ReleaseStreamType.keys(),
+    Unity3dVersioningApi.ReleaseStreamType.values(),
   );
 
   protected _parse(version: string): GenericVersion | null {
     const matches = regEx(
       /^(?<Major>\d+)\.(?<Minor>\d+)\.(?<Patch>\d+)(?<ReleaseStream>\w)(?<Build>\d+)/gm,
     ).exec(version);
-    if (!matches) {
+    if (!matches?.groups) {
       return null;
     }
-    const Major = matches.groups?.Major ?? '';
-    const Minor = matches.groups?.Minor ?? '';
-    const Patch = matches.groups?.Patch ?? '';
-    const ReleaseStream = matches.groups?.ReleaseStream ?? '';
-    const Build = matches.groups?.Build ?? '';
+    const { Major, Minor, Patch, ReleaseStream, Build } = matches.groups;
 
     const release = [
       parseInt(Major),
@@ -54,16 +50,21 @@ class Unity3dVersioningApi extends GenericVersioningApi {
   }
 
   protected override _compare(lhs: string, rhs: string): number {
-    const semverLhs = semver.parse(lhs.split(/(?=[a-z])/)[0]);
-    const semverRhs = semver.parse(rhs.split(/(?=[a-z])/)[0]);
+    const semverLhs = semver.parse(lhs.split(/(?=[a-z])/)[0])!;
+    const semverRhs = semver.parse(rhs.split(/(?=[a-z])/)[0])!;
 
-    const releaseStreamLhs = lhs.match(/(?<=[a-z])/)![0];
-    const releaseStreamRhs = rhs.match(/(?<=[a-z])/)![0];
+    const releaseStreamLhs = lhs.match(/([a-z])/)![0];
+    const releaseStreamRhs = rhs.match(/([a-z])/)![0];
 
     const indexLhs =
       Unity3dVersioningApi.ReleaseStreamTypeKeyOrder.indexOf(releaseStreamLhs);
     const indexRhs =
       Unity3dVersioningApi.ReleaseStreamTypeKeyOrder.indexOf(releaseStreamRhs);
+
+    const semVerCompare = semverLhs.compare(semverRhs);
+    if (semVerCompare !== 0) {
+      return semVerCompare;
+    }
 
     if (indexLhs > indexRhs) {
       return 1;
@@ -71,11 +72,7 @@ class Unity3dVersioningApi extends GenericVersioningApi {
     if (indexLhs < indexRhs) {
       return -1;
     }
-
-    if (!(semverLhs && semverRhs)) {
-      return super._compare(lhs, rhs);
-    }
-    return semverLhs.compare(semverRhs);
+    return 0;
   }
 }
 

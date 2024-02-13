@@ -3,8 +3,8 @@ import * as httpMock from '../../../../test/http-mock';
 import { Unity3dDatasource } from '.';
 
 const unity3dProviderDatasource = new Unity3dDatasource();
-const mockRSSFeeds = () => {
-  Object.entries(Unity3dDatasource.streams).map(([stream, url]) => {
+const mockRSSFeeds = (streams: { [keys: string]: string }) => {
+  Object.entries(streams).map(([stream, url]) => {
     const content = Fixtures.get(stream + '.xml');
 
     const uri = new URL(url);
@@ -14,8 +14,52 @@ const mockRSSFeeds = () => {
 };
 
 describe('modules/datasource/unity3d/index', () => {
+  it('returns stable and lts releases by default', async () => {
+    const qualifyingStreams = { ...Unity3dDatasource.streams };
+    delete qualifyingStreams.beta;
+    mockRSSFeeds(qualifyingStreams);
+    const responses = (
+      await unity3dProviderDatasource.getByStream(undefined, false)
+    )?.releases.map((release) => release.version);
+
+    // check that only letter f is present (final releases)
+    expect(responses!.every((version) => /[fp]/.test(version))).toBe(true);
+    // check that no version contains the letter b (beta release)
+    expect(responses!.every((version) => !/b/.test(version))).toBe(true);
+  });
+
+  it('returns hash if requested', async () => {
+    mockRSSFeeds({ stable: Unity3dDatasource.streams.stable });
+    const responsesWithoutHash = (
+      await unity3dProviderDatasource.getByStream(
+        Unity3dDatasource.streams.stable,
+        true,
+      )
+    )?.releases.map((release) => release.version);
+
+    expect(responsesWithoutHash!.length).toBeGreaterThan(0);
+    expect(
+      responsesWithoutHash!.every((version) => /\(.*\)/.test(version)),
+    ).toBe(true);
+  });
+
+  it('returns no hash if not requested', async () => {
+    mockRSSFeeds({ stable: Unity3dDatasource.streams.stable });
+    const responsesWithoutHash = (
+      await unity3dProviderDatasource.getByStream(
+        Unity3dDatasource.streams.stable,
+        false,
+      )
+    )?.releases.map((release) => release.version);
+
+    expect(responsesWithoutHash!.length).toBeGreaterThan(0);
+    expect(
+      responsesWithoutHash!.every((version) => !/\(.*\)/.test(version)),
+    ).toBe(true);
+  });
+
   it('returns different versions for each stream', async () => {
-    mockRSSFeeds();
+    mockRSSFeeds(Unity3dDatasource.streams);
     const responses: { [keys: string]: string[] } = Object.fromEntries(
       await Promise.all(
         Object.keys(Unity3dDatasource.streams).map(async (stream) => [
