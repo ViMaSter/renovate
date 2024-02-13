@@ -69,7 +69,8 @@ export class Unity3dDatasource extends Datasource {
 
   @cache({
     namespace: `datasource-${Unity3dDatasource.id}`,
-    key: (url: string) => url,
+    key: ({ registryUrl, packageName }: GetReleasesConfig) =>
+      `${registryUrl}:${packageName}`,
     ttlMinutes: 24 * 60,
   })
   async getReleases({
