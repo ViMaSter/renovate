@@ -59,7 +59,8 @@ export class Unity3dDatasource extends Datasource {
             return release;
           });
       })
-      .flat();
+      .flat()
+      .filter((release): release is Release => !!release);
 
     return {
       releases,
