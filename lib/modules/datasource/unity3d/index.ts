@@ -47,7 +47,7 @@ export class Unity3dDatasource extends Datasource {
           ?.childrenNamed('item')
           .map((itemNode) => {
             const versionWithHash =
-              `${itemNode.childNamed('title')?.val} (${itemNode.childNamed('guid')?.val})`!;
+              `${itemNode.childNamed('title')?.val} (${itemNode.childNamed('guid')?.val})`;
             const versionWithoutHash = itemNode.childNamed('title')?.val;
             const release: Release = {
               version: withHash ? versionWithHash : versionWithoutHash!,
