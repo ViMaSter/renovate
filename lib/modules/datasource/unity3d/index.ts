@@ -15,7 +15,7 @@ export class Unity3dDatasource extends Datasource {
 
   override readonly defaultRegistryUrls = [
     Unity3dDatasource.streams.stable,
-    Unity3dDatasource.streams.beta,
+    Unity3dDatasource.streams.lts,
   ];
 
   override readonly defaultVersioning = Unity3dVersioning.id;
@@ -30,35 +30,23 @@ export class Unity3dDatasource extends Datasource {
     registryUrl: string | undefined,
     withHash: boolean,
   ): Promise<ReleaseResult | null> => {
-    const registryUrls = registryUrl
-      ? [registryUrl]
-      : [Unity3dDatasource.streams.stable, Unity3dDatasource.streams.lts];
-
-    const responses = await Promise.all(
-      registryUrls.map((url) => this.http.get(url)),
-    );
-
-    const releases: Release[] = responses
-      .map((response) => {
-        const document = new XmlDocument(response.body);
-
-        return document
-          ?.childNamed('channel')
-          ?.childrenNamed('item')
-          .map((itemNode) => {
-            const versionWithHash = `${itemNode.childNamed('title')?.val} (${itemNode.childNamed('guid')?.val})`;
-            const versionWithoutHash = itemNode.childNamed('title')?.val;
-            const release: Release = {
-              version: withHash ? versionWithHash : versionWithoutHash!,
-              releaseTimestamp: itemNode.childNamed('pubDate')?.val,
-              changelogUrl: itemNode.childNamed('link')?.val,
-              isStable: registryUrl !== Unity3dDatasource.streams.beta,
-              registryUrl,
-            };
-            return release;
-          });
+    const response = await this.http.get(registryUrl!);
+    const document = new XmlDocument(response.body);
+    const releases = document
+      .childNamed('channel')!
+      .childrenNamed('item')
+      .map((itemNode) => {
+        const versionWithHash = `${itemNode.childNamed('title')?.val} (${itemNode.childNamed('guid')?.val})`;
+        const versionWithoutHash = itemNode.childNamed('title')?.val;
+        const release: Release = {
+          version: withHash ? versionWithHash : versionWithoutHash!,
+          releaseTimestamp: itemNode.childNamed('pubDate')?.val,
+          changelogUrl: itemNode.childNamed('link')?.val,
+          isStable: registryUrl !== Unity3dDatasource.streams.beta,
+          registryUrl,
+        };
+        return release;
       })
-      .flat()
       .filter((release): release is Release => !!release);
 
     return {

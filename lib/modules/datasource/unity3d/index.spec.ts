@@ -100,4 +100,16 @@ describe('modules/datasource/unity3d/index', () => {
       ),
     ).toBe(false);
   });
+
+  it('returns only lts and stable by default', async () => {
+    const qualifyingStreams = { ...Unity3dDatasource.streams };
+    delete qualifyingStreams.beta;
+    mockRSSFeeds(qualifyingStreams);
+    const responses = (await getPkgReleases({
+      datasource: Unity3dDatasource.id,
+      packageName: 'm_EditorVersionWithRevision',
+    }))!.releases.map((release) => release.version);
+
+    expect(responses.every((version) => /[fp]/.test(version))).toBe(true);
+  });
 });
