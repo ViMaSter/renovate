@@ -20,7 +20,7 @@ export class Unity3dDatasource extends Datasource {
 
   override readonly defaultVersioning = Unity3dVersioning.id;
 
-  override readonly registryStrategy = 'hunt';
+  override readonly registryStrategy = 'merge';
 
   constructor() {
     super(Unity3dDatasource.id);
